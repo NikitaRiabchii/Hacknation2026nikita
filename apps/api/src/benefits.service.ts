@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import type { BenefitRequest, RiskRequest } from './dto';
 
 @Injectable()
 export class BenefitsService {
-  calculate(dto: any) {
-    const basis = Number(dto.basis ?? 5000);
+  calculate(dto: BenefitRequest) {
+    const rawBasis = Number(dto.basis ?? 5000);
+    const basis = Number.isFinite(rawBasis) && rawBasis >= 0 ? rawBasis : 5000;
     const employment = dto.employmentType ?? 'Umowa o pracę';
     const scenario = String(dto.scenario ?? 'maternity');
-    const children = Math.max(1, Number(dto.children ?? 1));
+    const rawChildren = Number(dto.children ?? 1);
+    const children = Number.isFinite(rawChildren) ? Math.min(5, Math.max(1, Math.floor(rawChildren))) : 1;
     const enhancedCertificate = dto.enhancedCertificate === true;
 
     let name = 'Zasiłek macierzyński';
@@ -17,7 +20,7 @@ export class BenefitsService {
     if (scenario === 'maternity') {
       name = 'Urlop macierzyński i zasiłek macierzyński';
       weeks = [20, 31, 33, 35, 37][Math.min(children - 1, 4)] ?? 37;
-      rate = dto.benefitRate === '100' ? 1 : 0.815;
+      rate = dto.benefitRate === '100' ? 1 : dto.benefitRate === '70' ? 0.70 : 0.815;
       note = 'Kodeks: 20 tygodni dla jednego dziecka, 31/33/35/37 tygodni odpowiednio dla dwojga, trojga, czworga i pięciorga lub więcej dzieci.';
     } else if (scenario === 'parental') {
       name = 'Urlop i zasiłek rodzicielski';
@@ -31,12 +34,12 @@ export class BenefitsService {
     } else if (scenario === 'adoption') {
       name = 'Urlop na warunkach macierzyńskiego';
       weeks = [20, 31, 33, 35, 37][Math.min(children - 1, 4)] ?? 37;
-      rate = dto.benefitRate === '100' ? 1 : 0.815;
+      rate = dto.benefitRate === '100' ? 1 : dto.benefitRate === '70' ? 0.70 : 0.815;
       note = 'Wymiar zależy od liczby przyjętych/adoptowanych dzieci i wieku dziecka; zakres wymagających danych należy potwierdzić z ZUS i pracodawcą.';
     } else if (scenario === 'foster') {
       name = 'Urlop na warunkach macierzyńskiego i urlop rodzicielski';
       weeks = [20, 31, 33, 35, 37][Math.min(children - 1, 4)] ?? 37;
-      rate = dto.benefitRate === '100' ? 1 : 0.815;
+      rate = dto.benefitRate === '100' ? 1 : dto.benefitRate === '70' ? 0.70 : 0.815;
       note = 'Kodeks przewiduje 20 tygodni dla jednego dziecka i wydłużenie dla większej liczby dzieci; rodzinna piecza zastępcza może wymagać dodatkowych terminów i dokumentów.';
     } else if (scenario === 'sickness') {
       name = 'Wynagrodzenie chorobowe / zasiłek chorobowy';
@@ -50,12 +53,12 @@ export class BenefitsService {
       weeks = dto.durationWeeks ? Math.max(1, Number(dto.durationWeeks)) : 4;
     } else if (scenario === 'premature') {
       name = 'Uzupełniający urlop macierzyński';
-      rate = dto.benefitRate === '100' ? 1 : 0.815;
+      rate = dto.benefitRate === '100' ? 1 : dto.benefitRate === '70' ? 0.70 : 0.815;
       weeks = Math.max(0, Number(dto.hospitalWeeks ?? 0));
       note = 'Wymiar zależy od wieku ciążowego, masy urodzeniowej dziecka i okresu pobytu w szpitalu. Niepełny tydzień pobytu sumuje się i zaokrągla w górę do pełnego tygodnia.';
     } else if (scenario === 'death') {
       name = 'Urlop macierzyński po urodzeniu martwego dziecka / zgonie dziecka';
-      rate = dto.benefitRate === '100' ? 1 : 0.815;
+      rate = dto.benefitRate === '100' ? 1 : dto.benefitRate === '70' ? 0.70 : 0.815;
       weeks = Number(dto.childWeeksAfterBirth ?? 0) >= 8 ? 1 : 8;
       note = 'Jeśli dziecko urodziło się martwo albo zmarło przed upływem 8 tygodni życia: urlop macierzyński wynosi 8 tygodni po porodzie, co najmniej 7 dni od zgonu. Po 8 tygodniach życia zachowuje się 7 dni urlopu.';
     }
@@ -87,7 +90,7 @@ export class BenefitsService {
     };
   }
 
-  riskCheck(dto: any) {
+  riskCheck(dto: RiskRequest) {
     const issues: Array<{ severity: 'high' | 'medium' | 'low'; title: string; message: string }> = [];
     if (!dto.birthDate && !dto.expectedBirthDate) issues.push({ severity: 'high', title: 'Brak danych o porodzie', message: 'Podaj przewidywaną lub rzeczywistą datę porodu.' });
     if (!dto.employmentType) issues.push({ severity: 'high', title: 'Nieznany typ zatrudnienia', message: 'Wybierz umowę o pracę, zlecenie lub działalność gospodarczą.' });
@@ -95,7 +98,7 @@ export class BenefitsService {
     if (!dto.documents?.includes('ZUS ZLA')) issues.push({ severity: 'medium', title: 'Brak ZUS ZLA', message: 'Zweryfikuj wymagane zaświadczenie lekarskie.' });
     if (dto.scenario === 'parental') issues.push({ severity: 'medium', title: 'Termin wniosku', message: 'Wniosek o urlop rodzicielski składa się co najmniej 21 dni przed rozpoczęciem urlopu.' });
     if (dto.scenario === 'premature') issues.push({ severity: 'high', title: 'Zaświadczenie szpitala', message: 'Uzupełnij informację o pobycie dziecka w szpitalu i jego masie urodzeniowej.' });
-    if (dto.scenario === 'maternity' && dto.birthDate && dto.expectedBirthDate) issues.push({ severity: 'low', title: 'Sprawdź wcześniejsze wykorzystanie urlopu', message: 'Przed porodem można wykorzystać maksymalnie 6 tygodni urlopu macierzyńskiego.' });
+    if (dto.scenario === 'maternity' && dto.birthDate && dto.expectedBirthDate) issues.push({ severity: 'low', title: 'Sprawdź wcześniejsze wykorzystanie urlopu', message: 'Przed porodem można wykorzystać maksymalnie 6 tygodni urlopa macierzyńskiego.' });
     if (dto.terminationDate) issues.push({ severity: 'low', title: 'Okres ochronny', message: 'Po złożeniu wniosku o urlop ochronna zasada Kodeksu pracy zaczyna obowiązywać zgodnie z terminami określonymi ustawą.' });
     return { issues, score: Math.max(0, 100 - issues.length * 18) };
   }

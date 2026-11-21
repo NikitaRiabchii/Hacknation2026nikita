@@ -2,6 +2,7 @@ import { Body, Controller, Get, Header, Post, StreamableFile, NotFoundException 
 import { createReadStream, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { BenefitsService } from './benefits.service';
+import type { BenefitRequest, ChatRequest, DocumentRequest, RiskRequest } from './dto';
 
 @Controller('api')
 export class ZusController {
@@ -15,13 +16,13 @@ export class ZusController {
     return { connection: 'MOCK_PUE', insuranceStatus: 'Aktywne', unpaidContributions: 0, benefits: [{ name: 'Zasiłek macierzyński', status: 'W przygotowaniu', amount: null }], updatedAt: new Date().toISOString() };
   }
 
-  @Post('benefits/calculate') calculateLegacy(@Body() dto: any) { return this.benefits.calculate(dto); }
+  @Post('benefits/calculate') calculateLegacy(@Body() dto: BenefitRequest) { return this.benefits.calculate(dto); }
 
-  @Post('calculator/calculate') calculate(@Body() dto: any) { return this.benefits.calculate(dto); }
+  @Post('calculator/calculate') calculate(@Body() dto: BenefitRequest) { return this.benefits.calculate(dto); }
 
-  @Post('risk/check') riskCheck(@Body() dto: any) { return this.benefits.riskCheck(dto); }
+  @Post('risk/check') riskCheck(@Body() dto: RiskRequest) { return this.benefits.riskCheck(dto); }
 
-  @Post(['chat', 'assistant/chat']) async chat(@Body() dto: any) {
+  @Post(['chat', 'assistant/chat']) async chat(@Body() dto: ChatRequest) {
     const message = String(dto.message ?? '').trim();
     const history = Array.isArray(dto.history) ? dto.history.slice(-8) : [];
     if (!message) return { answer: 'Napisz pytanie, a pomogę doprecyzować sytuację i wymagane dokumenty.' };
@@ -51,11 +52,11 @@ export class ZusController {
         signal: AbortSignal.timeout(45000),
       });
       if (!response.ok) throw new Error(`LM Studio zwróciło status ${response.status}`);
-      const data: any = await response.json();
+      const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
       const answer = data?.choices?.[0]?.message?.content;
       if (typeof answer !== 'string' || !answer.trim()) throw new Error('Model nie zwrócił odpowiedzi');
       return { answer: answer.trim(), sources: ['LM Studio — openai/gpt-oss-20b', 'ZUS Nawigator — model konsultacyjny'], mode: 'local-ai' };
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       const lowercase = message.toLowerCase();
       let fallback = 'Możemy przygotować najważniejsze dokumenty i terminowe zadania. Uzupełnij dane o typie zatrudnienia i terminie.';
       if (lowercase.includes('zasiłek') || lowercase.includes('świadczenie')) fallback = 'Najczęściej sprawdź ZAM, ZUS ZLA oraz podstawę wymiaru. Kwota zależy od typu zatrudnienia i składki chorobowej.\n\nPotrzebne są: typ zatrudnienia, przewidywana data rozpoczęcia i aktywność ubezpieczenia chorobowego.';
@@ -64,21 +65,15 @@ export class ZusController {
     }
   }
 
-  @Post('documents/parse') parse(@Body() dto: any) {
+  @Post('documents/parse') parse(@Body() dto: DocumentRequest) {
     return { fileName: dto.fileName ?? 'dokument.pdf', extracted: { dateOfBirth: '2026-04-10', codeB: true, childrenCount: 1 }, completeness: 82, missingFields: ['numer PESEL dziecka'] };
   }
 
-  @Post('documents/generate') generate(@Body() dto: any) {
+  @Post('documents/generate') generate(@Body() dto: DocumentRequest) {
     return { bundleName: 'pakiet-zus-demo.pdf', documents: dto.documents ?? ['ZAM', 'ZUR3', 'ZAO4'], status: 'ready', downloadUrl: '/api/documents/download/demo' };
   }
 
   @Get('documents/download/demo') download() { return { message: 'Demo: generowanie PDF podłączone do integracji pdf-lib.' }; }
-
-  @Get('guide/parents') guideParents(@Body() dto: any): StreamableFile {
-    const filePath = resolve('static', 'Przewodnik_dla_rodzicow.pdf');
-    if (!existsSync(filePath)) throw new NotFoundException('Plik nie został znaleziony');
-    return new StreamableFile(createReadStream(filePath));
-  }
 
   @Get('guide/summary') guideSummary() {
     return {

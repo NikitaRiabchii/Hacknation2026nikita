@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import AppHeader from "../components/AppHeader";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { apiUrl } from "../lib/api";
 
 type ChatMessage = {
   role: "assistant" | "user";
@@ -54,7 +55,7 @@ export default function AssistantPage() {
     }));
 
     try {
-      const response = await fetch("http://localhost:4000/api/assistant/chat", {
+      const response = await fetch(apiUrl("/api/assistant/chat"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: question, history }),
@@ -80,7 +81,7 @@ export default function AssistantPage() {
   }
 
   return (
-    <main>
+    <main id="main-content">
       <AppHeader active="/asystent" />
       <section className="tab-page assistant-page">
         <div className="tab-heading">

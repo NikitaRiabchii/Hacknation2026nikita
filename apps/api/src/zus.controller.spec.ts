@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import { Test, TestingModule } from '@nestjs/testing';
 import { BenefitsService } from './benefits.service';
 import { ZusController } from './zus.controller';

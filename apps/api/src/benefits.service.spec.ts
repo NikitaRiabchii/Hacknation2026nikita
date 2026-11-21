@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import { BenefitsService } from './benefits.service';
 
 describe('BenefitsService', () => {

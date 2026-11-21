@@ -5,7 +5,7 @@ import AppHeader from "./components/AppHeader";
 
 export default function Home() {
 	return (
-		<main>
+		<main id="main-content">
 			<AppHeader active="/" />
 			<section className="dashboard-layout" aria-labelledby="dashboard-heading">
 				<div className="content dashboard-content">

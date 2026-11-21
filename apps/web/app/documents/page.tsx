@@ -2,6 +2,7 @@
 
 import { DragEvent, ChangeEvent, useRef, useState } from "react";
 import AppHeader from "../components/AppHeader";
+import { apiUrl } from "../lib/api";
 
 const documents = [
   "WNIOSEK ZAM — zasiłek macierzyński",
@@ -33,7 +34,7 @@ export default function DocumentsPage() {
     setMessage("");
     try {
       const selectedDocuments = documents.filter((_, index) => checked[index]);
-      const response = await fetch("http://localhost:4000/api/documents/generate", {
+      const response = await fetch(apiUrl("/api/documents/generate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ documents: selectedDocuments }),
@@ -48,6 +49,16 @@ export default function DocumentsPage() {
     }
   }
 
+  async function hasPdfSignature(file: File): Promise<boolean> {
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) return false;
+    try {
+      const bytes = new Uint8Array(await file.slice(0, 5).arrayBuffer());
+      return String.fromCharCode(...bytes) === "%PDF-";
+    } catch {
+      return false;
+    }
+  }
+
   async function validateFiles(files: FileList | File[]) {
     const incoming = Array.from(files);
     if (incoming.length === 0) return;
@@ -56,7 +67,7 @@ export default function DocumentsPage() {
     const problems: string[] = [];
 
     for (const file of incoming) {
-      const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+      const isPdf = await hasPdfSignature(file);
       if (!isPdf) {
         problems.push(`${file.name}: wymagany format PDF`);
         continue;
@@ -83,7 +94,7 @@ export default function DocumentsPage() {
           recognized.push(documents[index]);
 
           try {
-            await fetch("http://localhost:4000/api/documents/parse", {
+            await fetch(apiUrl("/api/documents/parse"), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ fileName: file.name }),
@@ -122,7 +133,7 @@ export default function DocumentsPage() {
   const progress = Math.round((checked.filter(Boolean).length / checked.length) * 100);
 
   return (
-    <main>
+    <main id="main-content">
       <AppHeader active="/documents" />
       <section className="tab-page">
         <div className="tab-heading">

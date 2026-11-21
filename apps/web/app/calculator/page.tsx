@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppHeader from "../components/AppHeader";
+import { apiUrl } from "../lib/api";
 
 const benefits = [
   ["sickness", "Zasiłek chorobowy", "100% podstawy", "#19a974"],
@@ -36,7 +37,7 @@ export default function CalculatorPage() {
   async function calculate() {
     setLoading(true); setError("");
     try {
-      const response = await fetch("http://localhost:4000/api/calculator/calculate", {
+      const response = await fetch(apiUrl("/api/calculator/calculate"), {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ scenario, basis: Number(basis), employmentType: employment, documents: ["ZAM", "ZUS ZLA"], startDate: "2026-04-15", children: Number(children), enhancedCertificate, benefitRate, sicknessReason, hospitalWeeks: Number(hospitalWeeks), childWeeksAfterBirth: Number(childWeeksAfterBirth) }),
       });
@@ -47,7 +48,7 @@ export default function CalculatorPage() {
   }
 
   return (
-    <main><AppHeader active="/calculator" />
+    <main id="main-content"><AppHeader active="/calculator" />
       <section className="tab-page">
         <div className="tab-heading"><div><p className="eyebrow">WYLICZENIE</p><h1>Kalkulator świadczeń</h1></div><span className="live">Aktualne dane ZUS</span></div>
         <div className="tab-grid">

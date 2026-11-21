@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AppHeader from "../components/AppHeader";
+import { apiUrl } from "../lib/api";
 
 type GuideSection = { title: string; text: string };
 
@@ -12,7 +13,7 @@ export default function GuidePage() {
 
   useEffect(() => {
     let active = true;
-    fetch("http://localhost:4000/api/guide/summary")
+    fetch(apiUrl("/api/guide/summary"))
       .then((response) => { if (!response.ok) throw new Error("Nie udało się pobrać informacji o poradniku"); return response.json(); })
       .then((data) => { if (active) setSections(data.sections ?? []); })
       .catch((err: unknown) => { if (active) setError(err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd."); })
@@ -21,12 +22,12 @@ export default function GuidePage() {
   }, []);
 
   return (
-    <main>
+    <main id="main-content">
       <AppHeader active="/poradnik" />
       <section className="tab-page guide-page">
         <div className="tab-heading">
           <div><p className="eyebrow">PORADNIK ZUS 2026</p><h1>Dla rodziców i opiekunów</h1></div>
-          <a className="primary guide-download" href="http://localhost:4000/api/guide/download">Pobierz książkę PDF</a>
+          <a className="primary guide-download" href={apiUrl("/api/guide/download")}>Pobierz książkę PDF</a>
         </div>
 
         <section className="guide-hero card">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
+import { apiUrl } from "../lib/api";
 
 const items = [
   ["/", "Panel główny"],
@@ -35,7 +36,7 @@ export default function AppHeader({ active = "/" }: { active?: string }) {
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/auth/login", {
+      const response = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
