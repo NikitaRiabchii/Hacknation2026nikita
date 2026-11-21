@@ -25,13 +25,29 @@ describe('ZUS mock API', () => {
   });
 
   it('returns chat guidance for benefits', async () => {
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ choices: [{ message: { content: '## Świadczenie\n\n- Formularz ZAM' } }] }),
+    }) as unknown as typeof fetch;
+
     const response = await zus.chat({ message: 'Jak uzyskać zasiłek?' });
-    expect(response.answer).toBeTruthy();
+    expect(response.answer).toContain('ZAM');
+    global.fetch = originalFetch;
   });
 
   it('returns chat guidance for leave', async () => {
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ choices: [{ message: { content: '## Urlop\n\nSprawdź typ zatrudnienia i termin.' } }] }),
+    }) as unknown as typeof fetch;
+
     const response = await zus.chat({ message: 'Urlop rodzicielski' });
-    expect(response.answer).toBeTruthy();
+    expect(response.answer).toContain('Urlop');
+    global.fetch = originalFetch;
   });
 
   it('parses a document with extracted demo fields', () => {
