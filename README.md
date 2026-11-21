@@ -111,6 +111,21 @@ Zatrzymanie usług: naciśnij `Ctrl+C` w każdym terminalu.
 
 Jeśli LM Studio jest niedostępne, aplikacja nadal działa i asystent przechodzi w tryb awaryjny.
 
+## Bezpieczeństwo, prywatność i samodzielność systemu AI
+
+Wersja demonstracyjna używa modelu sztucznej inteligencji uruchomionego lokalnie na osobistym komputerze, bez wysyłania pytań ani danych do zewnętrznego dostawcy chmury. Taka konfiguracja została zastosowana ze względów prywatności i bezpieczeństwa danych: pytania do asystenta, pliki i informacje użytkownika pozostają w lokalnym środowisku podczas prezentacji.
+
+Projekt symuluje wymagania bezpieczeństwa stosowane w systemach publicznych i dojrzałych usług e-government:
+
+- mock logowania mObywatel i mock PUE/eZUS zamiast połączenia z realnym kontem urzędowym,
+- brak przesyłania prawdziwych danych osobowych, PESEL-ów lub dokumentów do zewnętrznych usług,
+- testowanie formularzy i walidacji dokumentów bez korzystania z produkcyjnego podpisu elektronicznego,
+- lokalne przetwarzanie odpowiedzi AI przez LM Studio na osobistym komputerze,
+- przejrzysta informacja o trybie awaryjnym i o tym, że rozwiązanie jest MVP,
+- możliwość rozbudowy o uwierzytelnianie, szyfrowanie danych, kontrolę uprawnień i audyt działań przed wdrożeniem produkcyjnym.
+
+Celem tej konfiguracji jest ograniczenie ryzyka wycieku informacji i zwiększenie niezależności rozwiązania od usług zewnętrznych. Nie jest to jednak wdrożenie produkcyjne ZUS ani oficjalny kanał wymiany danych z administracją publiczną. Mock PUE/eZUS nie zastępuje rzeczywistego systemu państwowego i powinien być zastąpiony autoryzowaną integracją z odpowiednimi usługami urzędowymi przed użyciem z realnymi danymi.
+
 ## Budowa
 
 ```bash

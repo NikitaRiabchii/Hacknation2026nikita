@@ -860,3 +860,7 @@ button:disabled {
 .guide-status { color:#718077; }
 @media (max-width:900px) { .guide-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.guide-links>div { grid-template-columns:repeat(2,1fr); }.guide-download { min-width:150px; } }
 @media (max-width:520px) { .guide-download { min-width:44px; max-width:44px; width:44px; overflow:hidden; color:transparent; }.guide-download::after { content:'PDF'; color:#fff; }.guide-hero { grid-template-columns:94px 1fr; gap:14px; }.guide-book { width:88px; height:116px; }.guide-book span { font-size:24px; }.guide-grid { grid-template-columns:1fr; }.guide-links>div { grid-template-columns:1fr; } }
+
+.upload-zone.dragging { border-color:var(--green); background:#edf5ef; box-shadow:0 0 0 3px rgba(12,109,91,.08); }
+.file-validation { margin-top:12px; border-top:1px solid #edf0ea; padding-top:10px; }.file-validation>p { margin:8px 0 0; color:#718077; font-size:11px; line-height:1.45; white-space:pre-line; }.validated-files { display:flex; flex-wrap:wrap; gap:5px; }.validated-files>small { width:100%; color:#87908b; font-size:9px; font-weight:800; letter-spacing:.8px; }.validated-files>span { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-radius:999px; background:#edf4ec; color:var(--green); padding:5px 8px; font-size:10px; }
+.document-list-card .primary:disabled { background:#ccd3cc; color:#68716d; }

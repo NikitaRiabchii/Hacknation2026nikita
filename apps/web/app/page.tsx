@@ -12,7 +12,7 @@ export default function Home() {
 					<header className="hero">
 						<div>
 							<p className="eyebrow">CENTRUM ZUS</p>
-							<h1 id="dashboard-heading">Masz 3 narzędzia do wykorzystania</h1>
+							<h1 id="dashboard-heading">Masz 4 narzędzia do wykorzystania</h1>
 							<p>Sprawdź świadczenia, przygotuj dokumenty i porozmawiaj z asystentem ZUS.</p>
 						</div>
 					</header>
