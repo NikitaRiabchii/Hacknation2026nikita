@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import AppHeader from "../components/AppHeader";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type ChatMessage = {
   role: "assistant" | "user";
@@ -14,6 +16,19 @@ const suggestions = [
   "Kiedy mogę złożyć wniosek o urlop rodzicielski?",
   "Co zrobić po wcześniejszym porodzie?",
 ];
+
+function normalizeAiMarkdown(text: string): string {
+  return text
+    .replace(/\\r\\n/g, "\n")
+    .replace(/\\n/g, "\n")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\*{3,}(?=[^*])/g, "**")
+    .replace(/^[\t ]{2,}(?=\d+[.)]\s)/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/^[\t ]*[-•][\t ]+/gm, "- ")
+    .replace(/^\*\*([^*\n]+)\*\*$/gm, "## $1")
+    .trim();
+}
 
 export default function AssistantPage() {
   const [chat, setChat] = useState("");
@@ -80,7 +95,18 @@ export default function AssistantPage() {
             {messages.map((message, i) => (
               <div key={i} className={`message ${message.role}`}>
                 <span>{message.role === "assistant" ? "AI" : "AK"}</span>
-                <p>{message.text}</p>
+                {message.role === "assistant" ? (
+                  <div className="message-content">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        a: ({ children, href }) => <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>,
+                      }}
+                    >{normalizeAiMarkdown(message.text)}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p>{message.text}</p>
+                )}
               </div>
             ))}
             {loading && <div className="message assistant"><span>AI</span><p className="typing"><i /><i /><i /></p></div>}
