@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Header, Post, StreamableFile, NotFoundException } from '@nestjs/common';
+import { createReadStream, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { BenefitsService } from './benefits.service';
 
 @Controller('api')
@@ -24,7 +26,7 @@ export class ZusController {
     const history = Array.isArray(dto.history) ? dto.history.slice(-8) : [];
     if (!message) return { answer: 'Napisz pytanie, a pomogę doprecyzować sytuację i wymagane dokumenty.' };
 
-    const systemPrompt = `Jesteś polskim ekspertem ZUS Nawigator. ODPOWIADAJ WYŁĄCZNIE PO POLSKU. Nie używaj zdań ani fragmentów po angielsku. Pomagasz planować macierzyństwo i świadczenia. Wyjaśnij prawa, dokumenty ZAM/ZLA/ZUR3/ZAO4, podstawę wyliczenia, terminy i ryzyka. Zadaj najwyżej 2 krótkie pytania doprecyzowujące — wszystkie po polsku. Formatuj odpowiedź poprawnym Markdownem: używaj krótkich nagłówków zaczynających się od ##, numerowanych lub punktowanych list, pogrubień dla nazw formularzy i terminów oraz cytatów blokowych dla ważnych ostrzeżeń. Nie używaj surowych gwiazdek, niepowiązanego tekstu bez akapitu ani formatowania pseudo-Wiki. Nie gwarantuj wyniku ani nie przedstawiaj informacji jako aktualnego prawa — zaznacz, że decyzję potwierdza ZUS. Zachowuj zwięzłość i praktyczny ton. To aplikacja MVP, nie porada prawna.`;
+    const systemPrompt = `Jesteś polskim ekspertem ZUS Nawigator. ODPOWIADAJ WYŁĄCZNIE PO POLSKU. Pomagasz planować macierzyństwo i świadczenia na podstawie polskiego prawa pracy i przepisów ZUS. Uwzględniaj: urlop macierzyński 20, 31, 33, 35 lub 37 tygodni zależnie od liczby dzieci; maksymalnie 6 tygodni urlopu przed porodem; urlop rodzicielski zwykle do 41 lub 43 tygodni, a z zaświadczeniem „Za życiem” do 65 lub 67 tygodni; co najmniej 9 tygodni wyłącznego prawa każdego rodzica; wniosek o urlop rodzicielski co najmniej 21 dni przed rozpoczęciem; urlop ojcowski do 2 tygodni; uzupełniający urlop macierzyński dla wcześniaków zależny od pobytu dziecka w szpitalu i masy urodzeniowej; urlop macierzyński 8 tygodni po urodzeniu martwego dziecka lub zgonie przed upływem 8 tygodni życia. Wyjaśniaj ochronę pracownika przed rozwiązaniem umowy po złożeniu wniosku o urlopy rodzinne oraz potrzebę dokumentów ZAM/ZLA/ZUR3/ZAO4 i zaświadczeń. Zadaj najwyżej 2 krótkie pytania doprecyzowujące. Formatuj Markdownem: krótkie nagłówki, listy, pogrubienia i cytaty dla ostrzeżeń. Nie podawaj dokładnej decyzji prawnej bez danych i zaznacz, że ostateczne prawo potwierdza ZUS/pracodawca. To aplikacja MVP, nie porada prawna. Odpowiadaj zwięźle i po polsku.`;
 
     const body = {
       model: process.env.LM_STUDIO_MODEL ?? 'openai/gpt-oss-20b',
@@ -71,4 +73,35 @@ export class ZusController {
   }
 
   @Get('documents/download/demo') download() { return { message: 'Demo: generowanie PDF podłączone do integracji pdf-lib.' }; }
+
+  @Get('guide/parents') guideParents(@Body() dto: any): StreamableFile {
+    const filePath = resolve('static', 'Przewodnik_dla_rodzicow.pdf');
+    if (!existsSync(filePath)) throw new NotFoundException('Plik nie został znaleziony');
+    return new StreamableFile(createReadStream(filePath));
+  }
+
+  @Get('guide/summary') guideSummary() {
+    return {
+      title: 'Poradnik dla rodziców i opiekunów dzieci',
+      edition: 'ZUS, stan prawny 1 kwietnia 2026',
+      downloadUrl: '/api/guide/download',
+      sections: [
+        { title: 'Ubezpieczenia i praca', text: 'Zasady obowiązkowego ubezpieczenia chorobowego, pracy zlecenia i prowadzenia działalności gospodarczej.' },
+        { title: 'Zasiłek macierzyński', text: 'Prawo po porodzie, długość urlopu, warianty 81,5%, 100% i 70% oraz podział między rodziców.' },
+        { title: 'Urlopy i wcześniaki', text: 'Uzupełniający urlop macierzyński, urlop ojcowski i zasady uznawania pobytu dziecka w szpitalu.' },
+        { title: 'Zasiłek opiekuńczy', text: 'Opieka nad dzieckiem lub innym członkiem rodziny, limity roczne i formularze Z-15A/Z-15B.' },
+        { title: 'Pogrzeb i sytuacje szczególne', text: 'Zasiłek pogrzebowy po martwym porodzie, zasiłek po śmierci dziecka i wymagane dokumenty.' },
+        { title: 'Praktyczne kontakty', text: 'PUE/eZUS, mZUS, infolinia 22 560 16 00 oraz e-wizyta i e-mail mama@zus.pl.' },
+      ],
+    };
+  }
+
+  @Get('guide/download')
+  @Header('Content-Type', 'application/pdf')
+  @Header('Content-Disposition', 'attachment; filename="Poradnik-dla-rodzicow-ZUS-2026.pdf"')
+  guideDownload() {
+    const filePath = resolve(process.cwd(), '../../Materiały dla uczestników/Poradnik dla rodziców, ZUS 2026.pdf');
+    if (!existsSync(filePath)) throw new NotFoundException('Poradnik nie został znaleziony');
+    return new StreamableFile(createReadStream(filePath));
+  }
 }

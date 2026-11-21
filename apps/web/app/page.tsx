@@ -47,6 +47,16 @@ export default function Home() {
 							</div>
 							<span className="dashboard-action">Porozmawiaj z asystentem <span aria-hidden="true">→</span></span>
 						</Link>
+
+						<Link className="dashboard-card" href="/poradnik">
+							<span className="card-icon green" aria-hidden="true">PDF</span>
+							<div className="dashboard-card-content">
+								<p className="eyebrow">PORADNIK ZUS</p>
+								<h2>Dla rodziców i opiekunów</h2>
+								<p>Najważniejsze zasady ubezpieczeń, świadczeń, urlopów i formalności po narodzinach dziecka.</p>
+							</div>
+							<span className="dashboard-action">Otwórz poradnik <span aria-hidden="true">→</span></span>
+						</Link>
 					</nav>
 				</div>
 			</section>

@@ -8,6 +8,7 @@ const items = [
   ["/calculator", "Kalkulator"],
   ["/documents", "Dokumenty"],
   ["/asystent", "Asystent"],
+  ["/poradnik", "Poradnik"],
 ] as const;
 
 export default function AppHeader({ active = "/" }: { active?: string }) {

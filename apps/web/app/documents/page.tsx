@@ -21,12 +21,21 @@ export default function DocumentsPage() {
     finally { setLoading(false); }
   }
 
-  const documents = ["WNIOSEK ZAM", "ZUS ZLA", "ZAO4 — zaświadczenie o urodzeniu", "Zaświadczenie pracodawcy"];
+  const documents = [
+    "WNIOSEK ZAM — zasiłek macierzyński",
+    "ZUS ZLA — zaświadczenie lekarskie",
+    "Zaświadczenie o urodzeniu / pobycie dziecka w szpitalu",
+    "Dokumenty zatrudnienia i podstawy wymiaru",
+  ];
+  const progress = Math.round((checked.filter(Boolean).length / checked.length) * 100);
 
   return (
     <main><AppHeader active="/documents" />
       <section className="tab-page">
-        <div className="tab-heading"><div><p className="eyebrow">DOCUMENTS</p><h1>Dokumenty i formularze</h1></div><b className="completion">68% gotowe</b></div>
+        <div className="tab-heading"><div><p className="eyebrow">DOCUMENTS</p><h1>Dokumenty i formularze</h1></div><b className="completion">{progress}% gotowe</b></div>
+        <div className="documents-progress" role="progressbar" aria-label="Kompletność dokumentów" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
+          <span style={{ width: `${progress}%` }} />
+        </div>
         <div className="tab-grid documents-grid">
           <section className="card document-list-card"><h2>Lista kontrolna</h2>
             {documents.map((doc, i) => <label key={doc} className="check"><input type="checkbox" checked={checked[i]} onChange={() => setChecked((current) => current.map((value, index) => index === i ? !value : value))} /><span>{checked[i] ? "✓" : ""}</span><div><b>{doc}</b><small>{checked[i] ? "Gotowe" : "Wymaga uzupełnienia"}</small></div></label>)}

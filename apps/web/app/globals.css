@@ -587,7 +587,7 @@ button:disabled {
 .dashboard-content .hero { display:block; margin-bottom:28px; }
 .dashboard-content .hero h1 { margin:5px 0 8px; font-size:34px; }
 .dashboard-content .hero>div>p:last-child { margin:0; color:#718077; font-size:14px; }
-.dashboard-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; gap:18px; }
+.dashboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:stretch; gap:18px; }
 .dashboard-card { min-height:300px; border:1px solid var(--line); border-radius:12px; background:#fff; color:var(--ink); text-decoration:none; padding:22px; display:grid; grid-template-rows:46px 1fr auto; gap:18px; position:relative; transition:.18s ease; }
 .dashboard-card:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(24,48,44,.09); }
 .dashboard-card-content { min-width:0; }
@@ -616,8 +616,7 @@ button:disabled {
 .suggestions>small { grid-column:1/-1; color:#87908b; font-size:9px; font-weight:800; letter-spacing:.8px; }
 .suggestions button { min-height:38px; border:1px solid #d8ded7; border-radius:8px; background:#fafbf8; color:var(--ink); padding:8px 10px; font-size:11px; line-height:1.25; cursor:pointer; text-align:left; }
 .suggestions button:hover { border-color:#91b2a7; background:#f1f6f2; }
-@media (max-width:520px) { .suggestions { grid-template-columns:1fr; } }
-@media (max-width: 900px) {
+@media (max-width:900px) {
   .topbar {
     padding: 0 18px;
     gap: 12px;
@@ -847,3 +846,17 @@ button:disabled {
 .account-logout { width:100%; height:42px; margin-top:14px; border:1px solid #d5dad4; border-radius:7px; background:#fff; color:#9b3b2e; font-weight:700; cursor:pointer; }
 .mobywatel-mark { display:flex; justify-content:center; margin-bottom:12px; }.mobywatel-mark>span { width:52px; height:52px; border-radius:50%; background:var(--green); color:#fff; display:grid; place-items:center; font-size:28px; font-weight:800; }
 .account-popover>.eyebrow { text-align:center; }.account-popover>h2 { margin:4px 0 8px; text-align:center; font-size:20px; }.account-description { margin:0 auto 14px; text-align:center; max-width:320px; color:#718077; font-size:12px; line-height:1.5; }.account-form label { display:block; margin-top:10px; color:var(--ink); font-size:11px; font-weight:700; }.account-form input { width:100%; height:42px; margin-top:6px; border:1px solid #d8ddd6; border-radius:7px; background:#fff; padding:0 11px; }.account-form input[readonly] { background:#f2f3ef; color:#737d77; }.account-form .primary { margin-top:14px; }
+.documents-progress { height:7px; width:100%; margin:-10px 0 18px; overflow:hidden; border-radius:999px; background:#e2e5dc; }
+.documents-progress>span { display:block; height:100%; border-radius:999px; background:var(--green); transition:width .24s ease, background-color .24s ease; }
+.documents-progress[aria-valuenow="0"]>span { background:#cf7159; }
+.guide-page { max-width:1180px; }
+.guide-download { display:inline-grid; place-items:center; text-decoration:none; min-width:180px; }
+.guide-hero { display:grid; grid-template-columns:170px 1fr; align-items:center; gap:28px; margin-bottom:18px; background:linear-gradient(135deg,#fff 65%,#eff5ef); }
+.guide-hero h2 { margin:4px 0 8px; font-size:24px; }.guide-hero p:last-child { max-width:700px; margin:0; color:#718077; line-height:1.6; }
+.guide-book { width:150px; height:190px; border-radius:5px 12px 12px 5px; background:linear-gradient(135deg,#0c6d5b,#16473f); color:#fff; box-shadow:-8px 8px 18px rgba(24,48,44,.16); display:grid; place-content:center; text-align:center; transform:rotate(-2deg); }.guide-book span { font-size:36px; font-weight:800; }.guide-book small { margin-top:6px; font-size:9px; letter-spacing:1px; }
+.guide-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.guide-card { min-height:180px; }.guide-card>span { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:#edf4ef; color:var(--green); font-size:11px; font-weight:800; }.guide-card h2 { margin:14px 0 7px; font-size:17px; }.guide-card p { margin:0; color:#718077; line-height:1.55; font-size:13px; }
+.guide-links { margin-top:18px; }.guide-links h2 { margin:0 0 12px; }.guide-links>div { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }.guide-links a { min-height:42px; display:grid; place-items:center; border:1px solid #dde2da; border-radius:8px; color:var(--green); text-decoration:none; font-size:12px; text-align:center; }.guide-links a:hover { background:#f4f7f2; }
+.guide-status { color:#718077; }
+@media (max-width:900px) { .guide-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.guide-links>div { grid-template-columns:repeat(2,1fr); }.guide-download { min-width:150px; } }
+@media (max-width:520px) { .guide-download { min-width:44px; max-width:44px; width:44px; overflow:hidden; color:transparent; }.guide-download::after { content:'PDF'; color:#fff; }.guide-hero { grid-template-columns:94px 1fr; gap:14px; }.guide-book { width:88px; height:116px; }.guide-book span { font-size:24px; }.guide-grid { grid-template-columns:1fr; }.guide-links>div { grid-template-columns:1fr; } }
